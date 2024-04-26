@@ -2,6 +2,8 @@
 
 set -uo pipefail
 
+pacman -Sy dialog
+
 ### Get infomation from user ###
 hostname=$(dialog --stdout --inputbox "Enter hostname" 0 0) || exit 1
 clear
@@ -29,10 +31,25 @@ exec 2> >(tee "stderr.log")
 timedatectl set-ntp true
 
 ### Setup the disk and partitions ###
-cgdisk "${device}"
+fdisk "${device}"
+
+partition_list=$(ls ${device}*)
+root_partition=$(dialog --stdout --menu "Select root partition" 0 0 0 ${partition_list}) || exit 1
+swap_partition=$(dialog --stdout --menu "Select swap partition" 0 0 0 ${swap_partition}) || exit 1
+efi_partition=$(dialog --stdout --menu "Select EFI partition" 0 0 0 ${efi_partition}) || exit 1
+
+mkfs.ext4 ${root_partition}
+mkswap ${swap_partition}
+kfs.fat -F 32 ${efi_partition}
+
+mount ${root_partition} /mnt
+mount --mkdir ${efi_partition} /mnt/boot
+swapon ${swap_partition}
+
+clear
 
 ### Install and configure the basic system ###
-pacstrap -K /mnt base linux-zen linux-firmware
+pacstrap -K /mnt base linux-zen linux-firmware intel-ucode man-db man-pages texinfo
 
 genfstab -U /mnt >> /mnt/etc/fstab
 
