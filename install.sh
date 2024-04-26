@@ -49,7 +49,7 @@ swapon ${swap_partition} || exit 1
 clear
 
 ### Install and configure the basic system ###
-pacstrap -K /mnt base linux-zen linux-firmware intel-ucode man-db man-pages texinfo || exit 1
+pacstrap -K /mnt base linux-zen linux-firmware intel-ucode grub || exit 1
 
 genfstab -U /mnt >> /mnt/etc/fstab || exit 1
 
