@@ -33,14 +33,14 @@ timedatectl set-ntp true
 ### Setup the disk and partitions ###
 fdisk "${device}"
 
-partition_list=$(ls -1 ${device}*)
+partition_list=$(ls -1 ${device}* |awk '{ print $1 " " $1 }')
 root_partition=$(dialog --stdout --menu "Select root partition" 0 0 0 ${partition_list}) || exit 1
-swap_partition=$(dialog --stdout --menu "Select swap partition" 0 0 0 ${swap_partition}) || exit 1
-efi_partition=$(dialog --stdout --menu "Select EFI partition" 0 0 0 ${efi_partition}) || exit 1
+swap_partition=$(dialog --stdout --menu "Select swap partition" 0 0 0 ${partition_list}) || exit 1
+efi_partition=$(dialog --stdout --menu "Select EFI partition" 0 0 0 ${partition_list}) || exit 1
 
 mkfs.ext4 ${root_partition}
 mkswap ${swap_partition}
-kfs.fat -F 32 ${efi_partition}
+mkfs.fat -F 32 ${efi_partition}
 
 mount ${root_partition} /mnt
 mount --mkdir ${efi_partition} /mnt/boot
