@@ -33,7 +33,7 @@ timedatectl set-ntp true
 ### Setup the disk and partitions ###
 fdisk "${device}"
 
-partition_list=$(ls ${device}*)
+partition_list=$(ls -1 ${device}*)
 root_partition=$(dialog --stdout --menu "Select root partition" 0 0 0 ${partition_list}) || exit 1
 swap_partition=$(dialog --stdout --menu "Select swap partition" 0 0 0 ${swap_partition}) || exit 1
 efi_partition=$(dialog --stdout --menu "Select EFI partition" 0 0 0 ${efi_partition}) || exit 1
